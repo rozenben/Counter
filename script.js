@@ -47,7 +47,7 @@ function displayInventory() {
             cabinetTotal += count;
         });
         
-        cabinetElement.innerHTML += <div class="total">סה"כ בארון: ${cabinetTotal}</div>;
+        cabinetElement.innerHTML += `<div class="total">סה"כ בארון: ${cabinetTotal}</div>`;
         display.appendChild(cabinetElement);
         grandTotal += cabinetTotal;
     });
