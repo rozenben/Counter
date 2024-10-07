@@ -31,7 +31,7 @@ function displayInventory() {
     Object.keys(inventory).sort((a, b) => parseInt(a) - parseInt(b)).forEach(cabinet => {
         const cabinetElement = document.createElement('div');
         cabinetElement.className = 'cabinet';
-        cabinetElement.innerHTML = <h2>ארון ${cabinet}</h2>;
+        cabinetElement.innerHTML = `<h2>ארון ${cabinet}</h2>`;
         
         let cabinetTotal = 0;
         
