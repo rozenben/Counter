@@ -64,3 +64,29 @@ button:hover {
 .edit-btn:hover {
     background-color: #218838;
 }
+
+
+#generateReport {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#generateReport:hover {
+    background-color: #138496;
+}
+
+#reportOutput {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: none;
+}

@@ -1,5 +1,6 @@
 let inventory = JSON.parse(localStorage.getItem('inventory')) || {};
 
+
 function addOrUpdateItem(cabinet, shelf, count) {
     cabinet = parseInt(cabinet);
     shelf = parseInt(shelf);
@@ -80,6 +81,16 @@ function editShelf(cabinet, shelf) {
     }
 }
 
+
+function generateReport() {
+    const reportOutput = document.getElementById('reportOutput');
+    reportOutput.style.display = 'block';
+    reportOutput.textContent = JSON.stringify(inventory, null, 2);
+}
+
+document.getElementById('generateReport').addEventListener('click', generateReport);
+
+
 document.getElementById('inventoryForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const cabinet = document.getElementById('cabinetNumber').value;
@@ -97,3 +108,6 @@ if ('serviceWorker' in navigator) {
     .then((reg) => console.log('Service worker registered', reg))
     .catch((err) => console.log('Service worker not registered', err));
 }
+
+
+document.getElementById('generateReport').addEventListener('click', generateReport);
