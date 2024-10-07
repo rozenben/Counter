@@ -1,6 +1,5 @@
 let inventory = JSON.parse(localStorage.getItem('inventory')) || {};
 
-
 function addOrUpdateItem(cabinet, shelf, count) {
     cabinet = parseInt(cabinet);
     shelf = parseInt(shelf);
@@ -81,15 +80,11 @@ function editShelf(cabinet, shelf) {
     }
 }
 
-
 function generateReport() {
     const reportOutput = document.getElementById('reportOutput');
     reportOutput.style.display = 'block';
     reportOutput.textContent = JSON.stringify(inventory, null, 2);
 }
-
-document.getElementById('generateReport').addEventListener('click', generateReport);
-
 
 document.getElementById('inventoryForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -100,6 +95,8 @@ document.getElementById('inventoryForm').addEventListener('submit', function(e) 
     this.reset();
 });
 
+document.getElementById('generateReport').addEventListener('click', generateReport);
+
 displayInventory();
 
 // Service Worker Registration for PWA
@@ -108,6 +105,3 @@ if ('serviceWorker' in navigator) {
     .then((reg) => console.log('Service worker registered', reg))
     .catch((err) => console.log('Service worker not registered', err));
 }
-
-
-document.getElementById('generateReport').addEventListener('click', generateReport);
