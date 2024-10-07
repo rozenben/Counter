@@ -60,7 +60,7 @@ function displayInventory() {
 
 function editShelf(cabinet, shelf) {
     const currentCount = inventory[cabinet][shelf];
-    const newCount = prompt(עריכת כמות פריטים במדף ${shelf} בארון ${cabinet}. כמות נוכחית: ${currentCount}. הזן כמות חדשה:);
+    const newCount = prompt(`עריכת כמות פריטים במדף ${shelf} בארון ${cabinet}. כמות נוכחית: ${currentCount}. הזן כמות חדשה:`);
     
     if (newCount !== null) {
         const parsedCount = parseInt(newCount);
