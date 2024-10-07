@@ -54,7 +54,7 @@ function displayInventory() {
     
     const grandTotalElement = document.createElement('div');
     grandTotalElement.className = 'total';
-    grandTotalElement.textContent = סה"כ כללי: ${grandTotal};
+    grandTotalElement.textContent =  `סה"כ כללי: ${grandTotal}`;
     display.appendChild(grandTotalElement);
 }
 
