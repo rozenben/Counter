@@ -54,6 +54,7 @@
     <div id="inventory"></div>
 
     <button id="exportButton">ייצא לאקסל</button>
+    <button id="clearButton">מחק  גדוד/כנה/קומה</button>
 
 
     <script>
@@ -237,6 +238,37 @@
             return flatInventory;
         }
 
+        function clearData() {
+            const roomSelect = document.getElementById('roomSelect');
+            const closetSelect = document.getElementById('closetSelect');
+            const shelfSelect = document.getElementById('shelfSelect');
+
+            const room = roomSelect.value;
+            const closet = closetSelect.value;
+            const shelf = shelfSelect.value;
+
+            if (!room) {
+                alert('נא לבחור גדוד או כנה או קומה למחיקה.');
+                return;
+            }
+
+            if (room && !closet && !shelf) {
+                // ניקוי חדר שלם
+                delete inventory[room];
+            } else if (room && closet && !shelf) {
+                // ניקוי ארון ספציפי
+                delete inventory[room][closet];
+            } else if (room && closet && shelf) {
+                // ניקוי מדף ספציפי
+                delete inventory[room][closet][shelf];
+            }
+
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+            updateSelects();
+            displayInventory();
+            alert('הנתונים נוקו בהצלחה!');
+        }
+
         // אתחול והוספת מאזינים
         initProductSelect();
         updateSelects();
@@ -247,6 +279,7 @@
         document.getElementById('addButton').addEventListener('click', addItem);
         document.getElementById('updateButton').addEventListener('click', updateInventory);
         document.getElementById('exportButton').addEventListener('click', exportToExcel);
+        document.getElementById('clearButton').addEventListener('click', clearData);
     </script>
 </body>
 </html>
