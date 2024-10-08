@@ -239,35 +239,48 @@
         }
 
         function clearData() {
-            const roomSelect = document.getElementById('roomSelect');
-            const closetSelect = document.getElementById('closetSelect');
-            const shelfSelect = document.getElementById('shelfSelect');
+    const roomSelect = document.getElementById('roomSelect');
+    const closetSelect = document.getElementById('closetSelect');
+    const shelfSelect = document.getElementById('shelfSelect');
 
-            const room = roomSelect.value;
-            const closet = closetSelect.value;
-            const shelf = shelfSelect.value;
+    const room = roomSelect.value;
+    const closet = closetSelect.value;
+    const shelf = shelfSelect.value;
 
-            if (!room) {
-                alert('נא לבחור גדוד או כנה או קומה למחיקה.');
-                return;
-            }
+    if (!room) {
+        alert('נא לבחור לפחות חדר לניקוי.');
+        return;
+    }
 
-            if (room && !closet && !shelf) {
-                // ניקוי חדר שלם
-                delete inventory[room];
-            } else if (room && closet && !shelf) {
-                // ניקוי ארון ספציפי
-                delete inventory[room][closet];
-            } else if (room && closet && shelf) {
-                // ניקוי מדף ספציפי
-                delete inventory[room][closet][shelf];
-            }
+    let confirmMessage = '';
+    if (room && !closet && !shelf) {
+        confirmMessage =` האם אתה בטוח שברצונך למחוק את כל הנתונים של חדר ${room}?`;
+    } else if (room && closet && !shelf) {
+        confirmMessage =` האם אתה בטוח שברצונך למחוק את כל הנתונים של ארון ${closet} בחדר ${room}?`;
+    } else if (room && closet && shelf) {
+        confirmMessage =` האם אתה בטוח שברצונך למחוק את כל הנתונים של מדף ${shelf} בארון ${closet} בחדר ${room}?`;
+    }
 
-            localStorage.setItem('inventory', JSON.stringify(inventory));
-            updateSelects();
-            displayInventory();
-            alert('הנתונים נוקו בהצלחה!');
+    if (confirm(confirmMessage)) {
+        if (room && !closet && !shelf) {
+            // ניקוי חדר שלם
+            delete inventory[room];
+        } else if (room && closet && !shelf) {
+            // ניקוי ארון ספציפי
+            delete inventory[room][closet];
+        } else if (room && closet && shelf) {
+            // ניקוי מדף ספציפי
+            delete inventory[room][closet][shelf];
         }
+
+        localStorage.setItem('inventory', JSON.stringify(inventory));
+        updateSelects();
+        displayInventory();
+        alert('הנתונים נוקו בהצלחה!');
+    } else {
+        alert('פעולת הניקוי בוטלה.');
+    }
+}
 
         // אתחול והוספת מאזינים
         initProductSelect();
