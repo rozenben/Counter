@@ -3,20 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת מלאי מדפים - משופרת</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>מערכת ניהול מלאי</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        select, input, button {
+            margin: 5px;
+            padding: 5px;
+        }
+        #inventory {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>מערכת מלאי מדפים</h1>
-    <form id="inventoryForm">
-        <input type="number" id="cabinetNumber" placeholder="מספר ארון" required>
-        <input type="number" id="shelfNumber" placeholder="מספר מדף" required>
-        <input type="number" id="itemCount" placeholder="כמות פריטים" required>
-        <button type="submit">הוסף/עדכן פריט</button>
-    </form>
-    <button id="generateReport">הוצא דו"ח</button>
-    <div id="reportOutput"></div>
-    <div id="inventoryDisplay"></div>
-    <script src="script.js"></script>
+    <h1>מערכת ניהול מלאי</h1>
+
+    <div>
+        <h3>הוסף גדוד/כנה/קומה</h3>
+        <input type="number" id="roomInput" placeholder="מספר גדוד">
+        <input type="number" id="closetInput" placeholder="מספר כנה">
+        <input type="number" id="shelfInput" placeholder="מספר קומה">
+        <button id="addButton">הוסף</button>
+    </div>
+    
+    <div>
+        <h3>עדכן מלאי</h3>
+        <select id="roomSelect">
+            <option value="">בחר גדוד</option>
+        </select>
+        <select id="closetSelect">
+            <option value="">בחר כנה</option>
+        </select>
+        <select id="shelfSelect">
+            <option value="">בחר קומה</option>
+        </select>
+    </div>
+
+    <div>
+        <select id="productSelect"></select>
+        <input type="number" id="quantityInput" placeholder="כמות">
+        <button id="updateButton">עדכן מלאי</button>
+    </div>
+
+    <div id="inventory"></div>
+
+    <button id="exportButton">ייצא לאקסל</button>
+
+
+    <script>
+        // קובץ קונפיגורציה למוצרים
+        const productsConfig = ['מאג', 'מטול', 'קלע', 'M-4', 'M-16'];
+
+        // אתחול המערכת
+        let inventory = JSON.parse(localStorage.getItem('inventory')) || {};
+
+        function initProductSelect() {
+            const productSelect = document.getElementById('productSelect');
+            productsConfig.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                productSelect.appendChild(option);
+            });
+        }
+
+        function updateSelects() {
+            const roomSelect = document.getElementById('roomSelect');
+            const closetSelect = document.getElementById('closetSelect');
+            const shelfSelect = document.getElementById('shelfSelect');
+
+            roomSelect.innerHTML = '<option value="">בחר גדוד</option>';
+            closetSelect.innerHTML = '<option value="">בחר כנה</option>';
+            shelfSelect.innerHTML = '<option value="">בחר קומה</option>';
+
+            Object.keys(inventory).forEach(room => {
+                const option = document.createElement('option');
+                option.value = room;
+                option.textContent =` גדוד ${room}`;
+                roomSelect.appendChild(option);
+            });
+        }
+
+        function updateClosets() {
+            const roomSelect = document.getElementById('roomSelect');
+            const closetSelect = document.getElementById('closetSelect');
+            const room = roomSelect.value;
+
+            closetSelect.innerHTML = '<option value="">בחר כנה</option>';
+            shelfSelect.innerHTML = '<option value="">בחר קומה</option>';
+
+            if (room && inventory[room]) {
+                Object.keys(inventory[room]).forEach(closet => {
+                    const option = document.createElement('option');
+                    option.value = closet;
+                    option.textContent =` כנה ${closet}`;
+                    closetSelect.appendChild(option);
+                });
+            }
+        }
+
+        function updateShelves() {
+            const roomSelect = document.getElementById('roomSelect');
+            const closetSelect = document.getElementById('closetSelect');
+            const shelfSelect = document.getElementById('shelfSelect');
+            const room = roomSelect.value;
+            const closet = closetSelect.value;
+
+            shelfSelect.innerHTML = '<option value="">בחר קומה</option>';
+
+            if (room && closet && inventory[room] && inventory[room][closet]) {
+                Object.keys(inventory[room][closet]).forEach(shelf => {
+                    const option = document.createElement('option');
+                    option.value = shelf;
+                    option.textContent = `קומה ${shelf}`;
+                    shelfSelect.appendChild(option);
+                });
+            }
+        }
+
+        function displayInventory() {
+            const inventoryDiv = document.getElementById('inventory');
+            const roomSelect = document.getElementById('roomSelect');
+            const closetSelect = document.getElementById('closetSelect');
+            const shelfSelect = document.getElementById('shelfSelect');
+
+            const room = roomSelect.value;
+            const closet = closetSelect.value;
+            const shelf = shelfSelect.value;
+
+            let content = '';
+
+            if (room && closet && shelf && inventory[room] && inventory[room][closet] && inventory[room][closet][shelf]) {
+                content = `<h3>מלאי בגדוד ${room}, כנה ${closet}, קומה ${shelf}:</h3>`;
+                const shelfInventory = inventory[room][closet][shelf];
+                Object.keys(shelfInventory).forEach(product => {
+                    content += `<p>${product}: ${shelfInventory[product]}</p>`;
+                });
+            } else {
+                content = '<p>בחר גדוד, כנה וקומה כדי להציג את המלאי.</p>';
+            }
+
+            inventoryDiv.innerHTML = content;
+        }
+
+        function addItem() {
+            const roomInput = document.getElementById('roomInput');
+            const closetInput = document.getElementById('closetInput');
+            const shelfInput = document.getElementById('shelfInput');
+
+            const room = roomInput.value;
+            const closet = closetInput.value;
+            const shelf = shelfInput.value;
+
+            if (!room || !closet || !shelf) {
+                alert('נא להזין מספר גדוד, כנה וקומה.');
+                return;
+            }
+
+            if (!inventory[room]) inventory[room] = {};
+            if (!inventory[room][closet]) inventory[room][closet] = {};
+            if (!inventory[room][closet][shelf]) inventory[room][closet][shelf] = {};
+
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+            updateSelects();
+            alert('הפריט נוסף בהצלחה!');
+
+            roomInput.value = '';
+            closetInput.value = '';
+            shelfInput.value = '';
+        }
+
+        function updateInventory() {
+            const roomSelect = document.getElementById('roomSelect');
+            const closetSelect = document.getElementById('closetSelect');
+            const shelfSelect = document.getElementById('shelfSelect');
+            const productSelect = document.getElementById('productSelect');
+            const quantityInput = document.getElementById('quantityInput');
+
+            const room = roomSelect.value;
+            const closet = closetSelect.value;
+            const shelf = shelfSelect.value;
+            const product = productSelect.value;
+            const quantity = parseInt(quantityInput.value);
+
+            if (!room || !closet || !shelf || !product || isNaN(quantity)) {
+                alert('נא למלא את כל השדות.');
+                return;
+            }
+
+            if (!inventory[room]) inventory[room] = {};
+            if (!inventory[room][closet]) inventory[room][closet] = {};
+            if (!inventory[room][closet][shelf]) inventory[room][closet][shelf] = {};
+
+            inventory[room][closet][shelf][product] = quantity;
+
+            localStorage.setItem('inventory', JSON.stringify(inventory));
+            displayInventory();
+            alert('המלאי עודכן בהצלחה!');
+
+            quantityInput.value = '';
+        }
+
+        function exportToExcel() {
+            const ws = XLSX.utils.json_to_sheet(flattenInventory());
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Inventory");
+            XLSX.writeFile(wb, "inventory_report.xlsx");
+        }
+
+        function flattenInventory() {
+            const flatInventory = [];
+            Object.keys(inventory).forEach(room => {
+                Object.keys(inventory[room]).forEach(closet => {
+                    Object.keys(inventory[room][closet]).forEach(shelf => {
+                        Object.keys(inventory[room][closet][shelf]).forEach(product => {
+                            flatInventory.push({
+                                גדוד: room,
+                                כנה: closet,
+                                קומה: shelf,
+                                סוג: product,
+                                כמות: inventory[room][closet][shelf][product]
+                            });
+                        });
+                    });
+                });
+            });
+            return flatInventory;
+        }
+
+        // אתחול והוספת מאזינים
+        initProductSelect();
+        updateSelects();
+
+        document.getElementById('roomSelect').addEventListener('change', updateClosets);
+        document.getElementById('closetSelect').addEventListener('change', updateShelves);
+        document.getElementById('shelfSelect').addEventListener('change', displayInventory);
+        document.getElementById('addButton').addEventListener('click', addItem);
+        document.getElementById('updateButton').addEventListener('click', updateInventory);
+        document.getElementById('exportButton').addEventListener('click', exportToExcel);
+    </script>
 </body>
 </html>

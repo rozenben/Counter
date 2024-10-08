@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת מלאי מדפים - משופרת</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>מערכת מלאי מדפים</h1>
+    <form id="inventoryForm">
+        <input type="number" id="cabinetNumber" placeholder="מספר ארון" required>
+        <input type="number" id="shelfNumber" placeholder="מספר מדף" required>
+        <input type="number" id="itemCount" placeholder="כמות פריטים" required>
+        <button type="submit">הוסף/עדכן פריט</button>
+    </form>
+    <button id="generateReport">הוצא דו"ח</button>
+    <div id="reportOutput"></div>
+    <div id="inventoryDisplay"></div>
+    <script src="script.js"></script>
+</body>
+</html>
